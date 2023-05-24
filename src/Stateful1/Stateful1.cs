@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using MyClassLibrary;
 
 namespace Stateful1
 {
@@ -43,27 +46,46 @@ namespace Stateful1
 
             var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
 
-            while (true)
-            //for (int i=0; i<10; i++) 
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                Assembly a = Assembly.GetExecutingAssembly();
+                OutputDebugString(a.Location);
 
-                using (var tx = this.StateManager.CreateTransaction())
+                var dt = Class1.Method1();
+                OutputDebugString(dt.ToShortDateString() + " " + dt.ToShortTimeString());
+
+                while (true)
+                //for (int i=0; i<10; i++) 
                 {
-                    var result = await myDictionary.TryGetValueAsync(tx, "Counter");
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    ServiceEventSource.Current.ServiceMessage(this.Context, "Current Counter Value: {0}",
-                        result.HasValue ? result.Value.ToString() : "Value does not exist.");
+                    using (var tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await myDictionary.TryGetValueAsync(tx, "Counter");
+                        string msg = string.Format("Current Counter Value: {0}",
+                            result.HasValue ? result.Value.ToString() : "Value does not exist.");
+                        OutputDebugString(msg);
+                        ServiceEventSource.Current.ServiceMessage(this.Context, msg);
 
-                    await myDictionary.AddOrUpdateAsync(tx, "Counter", 0, (key, value) => ++value);
+                        await myDictionary.AddOrUpdateAsync(tx, "Counter", 0, (key, value) => ++value);
 
-                    // If an exception is thrown before calling CommitAsync, the transaction aborts, all changes are 
-                    // discarded, and nothing is saved to the secondary replicas.
-                    await tx.CommitAsync();
+                        // If an exception is thrown before calling CommitAsync, the transaction aborts, all changes are 
+                        // discarded, and nothing is saved to the secondary replicas.
+                        await tx.CommitAsync();
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                OutputDebugString(ex.GetType().ToString() + ", " + ex.Message);
+                throw;
             }
         }
+
+        [DllImport("kernel32", EntryPoint = "OutputDebugStringW", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern void OutputDebugString(string s);
+
     }
 }

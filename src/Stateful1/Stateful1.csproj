@@ -12,11 +12,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\__%28for info%29 Ports used by Service Fabric.png" Link="__%28for info%29 Ports used by Service Fabric.png" />
     <Content Include="..\__MYREADME.txt" Link="__MYREADME.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.1.1653" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyClassLibrary\MyClassLibrary.csproj" />
   </ItemGroup>
 
 </Project>
