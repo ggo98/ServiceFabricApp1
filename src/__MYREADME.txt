@@ -7,7 +7,7 @@ http://localhost:19080/Explorer/index.html#/
 * Note: le service Stateful1 va là:
 C:\SfDevCluster\Data\_App\_Node_0\ServiceFabricApp1Type_App1\Stateful1Pkg.Code.1.0.0
 
-* installer les cmdlets de ServiceFabric (MARCHE PAS):
+* installer les cmdlets de ServiceFabric (ne marche apparemment PAS):
 (once)
 Install-Module -Name ServiceFabric -Force
 #Install-Module -Name ServiceFabric -AllowPrerelease -Force
