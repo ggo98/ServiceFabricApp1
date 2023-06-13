@@ -18,6 +18,21 @@ Import-Module -Name ServiceFabric
 
 #cls
 
+# Import the cluster setup utility module
+<# A VOIR
+$sdkInstallPath = (Get-ItemProperty 'HKLM:\Software\Microsoft\Service Fabric SDK').FabricSDKScriptsPath
+$modulePath = Join-Path -Path $sdkInstallPath -ChildPath "ClusterSetupUtilities.psm1"
+Import-Module $modulePath
+# start local cluster
+#if (-not (IsLocalClusterRunning))
+{
+    StartLocalCluster
+}
+#>
+# A retester.
+# Start-Service FabricHostSvc
+
+Connect-ServiceFabricCluster -ConnectionEndpoint localhost:19000 -metadata
 Write-Host("Connect-ServiceFabricCluster 1")
 Connect-ServiceFabricCluster -ConnectionEndpoint localhost:19000
 Write-Host("Connect-ServiceFabricCluster 2")
